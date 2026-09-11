@@ -13,6 +13,7 @@ out/
 .env
 .env.local
 !.env.example
+firebase-service-account.json
 
 # Logs e arquivos do sistema
 *.log
