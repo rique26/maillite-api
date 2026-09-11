@@ -11,10 +11,10 @@ import com.maillite.mailliteapi.push.service.FcmPushService;
 import com.maillite.mailliteapi.user.entity.User;
 import com.maillite.mailliteapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,13 +51,12 @@ public class MessageService {
         return MessageResponseDto.fromEntity(saved);
     }
 
-    /** RF05: inbox do usuário autenticado, mais recentes primeiro. */
-    public List<MessageResponseDto> getInbox() {
+    /** RF05: inbox paginada do usuário autenticado. */
+    public Page<MessageResponseDto> getInbox(Pageable pageable) {
         User currentUser = currentUserProvider.getCurrentUser();
 
-        return messageRepository.findInboxByRecipientId(currentUser.getId()).stream()
-                .map(MessageResponseDto::fromEntity)
-                .toList();
+        return messageRepository.findByRecipientId(currentUser.getId(), pageable)
+                .map(MessageResponseDto::fromEntity);
     }
 
     /** RF06: retorna detalhes da mensagem e marca automaticamente como lida. */

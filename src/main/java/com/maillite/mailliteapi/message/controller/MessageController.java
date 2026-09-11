@@ -6,10 +6,12 @@ import com.maillite.mailliteapi.message.service.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/messages")
@@ -25,10 +27,16 @@ public class MessageController {
         return messageService.send(dto);
     }
 
+    /**
+     * RF05, paginada. Exemplo: GET /v1/messages/inbox?page=0&size=20
+     * Ordenação padrão: mais recentes primeiro (sentAt DESC) — pode ser sobrescrita
+     * via ?sort=subject,asc, por exemplo.
+     */
     @GetMapping("/inbox")
     @ResponseStatus(HttpStatus.OK)
-    public List<MessageResponseDto> inbox() {
-        return messageService.getInbox();
+    public Page<MessageResponseDto> inbox(
+            @PageableDefault(size = 20, sort = "sentAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return messageService.getInbox(pageable);
     }
 
     @GetMapping("/{id}")

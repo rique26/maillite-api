@@ -19,6 +19,10 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -139,7 +143,7 @@ class MessageServiceTest {
     class GetInbox {
 
         @Test
-        @DisplayName("Should return list of messages for current user inbox")
+        @DisplayName("Should return paginated inbox for current user")
         void shouldReturnInboxSuccessfully() {
             // Arrange
             var currentUser = User.builder().id(1L).build();
@@ -151,18 +155,20 @@ class MessageServiceTest {
                     .subject("Inbox Subject")
                     .body("Inbox Body")
                     .build();
+            Pageable pageable = PageRequest.of(0, 20);
+            Page<Message> page = new PageImpl<>(List.of(message), pageable, 1);
 
             when(currentUserProvider.getCurrentUser()).thenReturn(currentUser);
-            when(messageRepository.findInboxByRecipientId(1L)).thenReturn(List.of(message));
+            when(messageRepository.findByRecipientId(1L, pageable)).thenReturn(page);
 
             // Act
-            List<MessageResponseDto> inbox = messageService.getInbox();
+            Page<MessageResponseDto> inbox = messageService.getInbox(pageable);
 
             // Assert
             assertNotNull(inbox);
-            assertEquals(1, inbox.size());
-            assertEquals("Inbox Subject", inbox.get(0).subject());
-            verify(messageRepository, times(1)).findInboxByRecipientId(1L);
+            assertEquals(1, inbox.getTotalElements());
+            assertEquals("Inbox Subject", inbox.getContent().get(0).subject());
+            verify(messageRepository, times(1)).findByRecipientId(1L, pageable);
         }
     }
 
