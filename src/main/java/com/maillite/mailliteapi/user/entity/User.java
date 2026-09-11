@@ -1,4 +1,4 @@
-package com.maillite.mailliteapi.auth.entity;
+package com.maillite.mailliteapi.user.entity;
 
 import com.maillite.mailliteapi.config.AuthenticatedUser;
 import jakarta.persistence.*;

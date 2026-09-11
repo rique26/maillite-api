@@ -21,6 +21,9 @@ jwt:
   expiration: ${EXPIRATION-JWT:86400000} # 24 hours
   key: ${JWT_KEY}
 
+firebase:
+  credentials-path: ${FIREBASE_CREDENTIALS_PATH:firebase-service-account.json}
+
 logging:
   level:
     org.flywaydb: DEBUG

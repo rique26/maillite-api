@@ -1,0 +1,29 @@
+package com.maillite.mailliteapi.user.repository;
+
+import com.maillite.mailliteapi.user.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    Optional<User> findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    /**
+     * Autocomplete de destinatários (RF03): busca case-insensitive por nome ou e-mail,
+     * excluindo o próprio usuário autenticado dos resultados.
+     */
+    @Query("""
+            SELECT u FROM User u
+            WHERE u.id <> :currentUserId
+              AND (LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%'))
+                   OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')))
+            ORDER BY u.name ASC
+            """)
+    List<User> searchByNameOrEmail(@Param("query") String query, @Param("currentUserId") Long currentUserId);
+}

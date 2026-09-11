@@ -1,6 +1,6 @@
 package com.maillite.mailliteapi.auth.service;
 
-import com.maillite.mailliteapi.auth.repository.UserRepository;
+import com.maillite.mailliteapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
